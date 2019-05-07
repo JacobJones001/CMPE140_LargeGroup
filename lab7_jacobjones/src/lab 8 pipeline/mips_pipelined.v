@@ -12,6 +12,9 @@ module mips_pipelined (
         output wire [31:0] wd_rf,
         output wire [4:0] rf_wa
     );
+
+    // F2D edit
+    wire [31:0] instr_D;
     
     wire       jal;
     wire       branch;
@@ -53,14 +56,15 @@ module mips_pipelined (
             .rd3            (rd3),
             .wd_rf          (wd_rf),
             .rf_wa          (rf_wa),
+            .instr_D        (instr_D),
 
             .we_dm_D(we_dm_D),
             .we_dm_M(we_dm)
         );
 
     controlunit cu (
-            .opcode         (instr[31:26]),
-            .funct          (instr[5:0]),
+            .opcode         (instr_D[31:26]),
+            .funct          (instr_D[5:0]),
             .jal            (jal),
             .branch         (branch),
             .jump           (jump),

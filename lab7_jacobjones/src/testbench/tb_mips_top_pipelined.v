@@ -16,7 +16,13 @@ module tb_mips_top_pipelined;
     wire [31:0] gpo0;
     wire [31:0] gpo1;
     
+    // extra debug
+    wire [31:0]  pc_next = DUT.mips.dp.pc_next;
+
     // Debug
+    // --- F2D --- //
+    wire [31:0]  instr_D = DUT.mips.dp.instr_D;
+    wire [31:0]  pc_plus4_D = DUT.mips.dp.pc_plus4_D;
     // --- D2E --- //
         // -- data -- //
     wire [31:0]  rd1_out = DUT.mips.dp.rd1_out;
