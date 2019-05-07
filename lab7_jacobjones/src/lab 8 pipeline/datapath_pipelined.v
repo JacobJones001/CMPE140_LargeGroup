@@ -23,10 +23,15 @@ module datapath_pipelined (
         output wire [31:0] rd3,
         output wire [31:0] wd_rf,
         output wire [4:0] rf_wa,
+        output wire [31:0] instr_D,
 
         input wire we_dm_D,
         output wire we_dm_M
     );
+
+        // F2D edit
+        wire [31:0] pc_plus4_D;
+        // wire [31:0] instr_D;
 
         // we_reg edit
         wire we_reg_E, we_reg_M, we_reg_WB;
@@ -116,7 +121,7 @@ module datapath_pipelined (
     
     assign pc_src = branch_E & zero_E;
     assign ba = {sext_imm[29:0], 2'b00};
-    assign jta = {pc_plus4[31:28], instr[25:0], 2'b00};
+    assign jta = {pc_plus4_D[31:28], instr_D[25:0], 2'b00};
     
     // --- PC Logic --- //
     dreg pc_reg (
@@ -162,8 +167,8 @@ module datapath_pipelined (
     // --- RF Logic --- //
     mux2 #(5) rf_wa_mux (
             .sel            (reg_dst),
-            .a              (instr[20:16]),
-            .b              (instr[15:11]),
+            .a              (instr_D[20:16]),
+            .b              (instr_D[15:11]),
             .y              (reg_addr)
         );
 
@@ -177,8 +182,8 @@ module datapath_pipelined (
     regfile rf (
             .clk            (clk),
             .we             (we_reg_WB),
-            .ra1            (instr[25:21]),
-            .ra2            (instr[20:16]),
+            .ra1            (instr_D[25:21]),
+            .ra2            (instr_D[20:16]),
             .ra3            (ra3),
             .wa             (rf_wa_WB),
             .wd             (wd_rf),
@@ -188,7 +193,7 @@ module datapath_pipelined (
         );
 
     signext se (
-            .a              (instr[15:0]),
+            .a              (instr_D[15:0]),
             .y              (sext_imm_D)
         );
 
@@ -207,7 +212,7 @@ module datapath_pipelined (
     mux2 #(5) shift_rd1_mux (
         .sel    (shift_mux_sel_E),
         .a      (rd1_out[4:0]),
-        .b      (instr[10:6]),
+        .b      (instr_D[10:6]),
         .y      (shift_rd1_out)
     );
 
@@ -267,6 +272,15 @@ module datapath_pipelined (
         .y    (alu_mux_out)
     );
 
+fetch2decode fetch2decode(
+    .clk(clk),
+    .rst(rst),
+    .instr(instr),
+    .pc_plus4(pc_plus4),
+    .instr_D(instr_D),
+    .pc_plus4_D(pc_plus4_D)
+);
+
  
 decode2execute decode2execute(
     .clk            (clk),
@@ -274,7 +288,7 @@ decode2execute decode2execute(
     .rd1out_D       (rd1_out),
     .wd_dm_D        (wd_dm),
     .sext_imm_D     (sext_imm_D),    
-    .pc_plus4_D     (pc_plus4),
+    .pc_plus4_D     (pc_plus4_D),
     .rf_wa          (rf_wa),
     
 
