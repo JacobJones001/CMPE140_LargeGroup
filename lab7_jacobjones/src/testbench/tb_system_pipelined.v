@@ -1,4 +1,4 @@
-module tb_system_pipeline;
+module tb_system_pipelined;
 
     reg         clk;
     reg         rst;
@@ -20,7 +20,7 @@ module tb_system_pipeline;
 
     integer error_count = 0;
 
-    system DUT(
+    system_pipelined DUT(
         .clk(clk),
         .rst(rst),
         .gpi0(gpi0),
@@ -47,10 +47,10 @@ module tb_system_pipeline;
 
     initial begin
         reset;
-        gpi0 = 32'b0000;
+        gpi0 = 32'b1010;
         gpi1 = 32'b0000;
         // run_test;
-        while(pc_current != 32'h58) 
+        while(pc_current != 32'h140) 
         begin
             tick;
         end
