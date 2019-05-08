@@ -1,4 +1,9 @@
 module decode2execute(
+	input wire stall_d2e,
+	input wire [31:0] instr_D,
+	output reg [4:0] rs1E,
+	output reg [4:0] rs2E,
+
 	input wire clk,
 	input wire rst,
 	input wire [31:0] rd1out_D,
@@ -6,20 +11,6 @@ module decode2execute(
 	input wire [31:0] sext_imm_D, 
 	input wire [31:0] pc_plus4_D,
 	input wire [4:0]  rf_wa,
-//	input wire  alu_out_sel_D,
-//	input wire	shift_mux_sel_D,
-//    input wire  jal_D,
-//    input wire  hilo_sel_D,
-//    input wire  reg_jump_D,
-//    input wire  jump_D,
-//    input wire  dm2reg_D,
-//    input wire  we_dm_D,
-//    input wire  branch_D,
-//    input wire  alu_src_D,
-//    input wire  reg_dst_D,
-//    input wire  we_reg_D,
-//    input wire  alu_ctrl_D,
-	
 
 	output reg [31:0] rd1out_E, 
 	output reg [31:0] wd_dm_E,
@@ -42,6 +33,10 @@ module decode2execute(
 always @ (posedge clk, posedge rst) begin
 if (rst)
 begin
+	// Hazard
+	rs1E <= 0;
+	rs2E <= 0;
+
 	rd1out_E 	<= 0;
 	wd_dm_E 	<= 0;
 	sext_imm_E 	<= 0;
@@ -63,8 +58,39 @@ begin
 	alu_ctrl_E 		<= 0;
 	we_reg_E		<= 0;
 end
+else if(stall_d2e)
+begin
+	// Hazard
+	rs1E <= rs1E;
+	rs2E <= rs2E;
+
+	rd1out_E 	<= rd1out_E;
+	wd_dm_E 	<= wd_dm_E;
+	sext_imm_E 	<= sext_imm_E;
+	pc_plus4_E  <= pc_plus4_E;
+	rf_wa_E		<= rf_wa_E;
+	
+	//CONTROL UNIT
+	we_hilo_E 		<= we_hilo_E;
+	alu_out_sel_E 	<= alu_out_sel_E;
+	shift_mux_sel_E <= shift_mux_sel_E;
+	jal_E 			<= jal_E;
+	hilo_sel_E 		<= hilo_sel_E;
+	reg_jump_E 		<= reg_jump_E;
+	jump_E 			<= jump_E;
+	dm2reg_E 		<= dm2reg_E;
+	we_dm_E 		<= we_dm_E;
+	branch_E 		<= branch_E;
+	alu_src_E 		<= alu_src_E;
+	alu_ctrl_E 		<= alu_ctrl_E;
+	we_reg_E		<= we_reg_E;
+end
 else
 begin
+	// Hazard
+	rs1E <= instr_D[25:21];
+	rs2E <= instr_D[20:16];
+
 	rd1out_E 	<= rd1out_D;
 	wd_dm_E 	<= wd_dm_D;
 	sext_imm_E 	<= sext_imm_D;
@@ -85,21 +111,6 @@ begin
 	alu_src_E 		<= alu_src;
 	alu_ctrl_E 		<= alu_ctrl;
 	we_reg_E		<= we_reg;
-	
-	
-	
-//		we_hilo_E 		<= we_hilo_D;
-//    alu_out_sel_E     <= alu_out_sel_D;
-//    shift_mux_sel_E <= shift_mux_sel_D;
-//    jal_E             <= jal_D;
-//    hilo_sel_E         <= hilo_sel_D;
-//    reg_jump_E         <= reg_jump_D;
-//    jump_E             <= jump_D;
-//    dm2reg_E         <= dm2reg_D;
-//    we_dm_E         <= we_dm_D;
-//    branch_E         <= branch_D;
-//    alu_src_E         <= alu_src_D;
-//    alu_ctrl_E         <= alu_ctrl_D;
 end
 end
 endmodule

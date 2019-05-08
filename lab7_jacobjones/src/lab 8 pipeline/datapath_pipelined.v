@@ -32,6 +32,14 @@ module datapath_pipelined (
         output wire [31:0] wd_dm_M       
     );
 
+        // hazard unit addition
+        wire stall_pc, stall_f2d, stall_d2e, stall_e2m, stall_m2wb;
+            // DF
+        wire [1:0] alu_DF_sel_rd1, alu_DF_sel_rd2;
+        wire [4:0] rs1E, rs2E; 
+        wire [31:0] alu_DF_rd1_out;    
+        wire [31:0] alu_DF_rd2_out;    
+
         // lw and sw fix
         wire [31:0] rd1_shift_full_out;
         wire lw_sw_zero_sel_E;
@@ -131,7 +139,8 @@ module datapath_pipelined (
     assign jta = {pc_plus4_D[31:28], instr_D[25:0], 2'b00};
     
     // --- PC Logic --- //
-    dreg pc_reg (
+    dreg_pipelined pc_reg (
+            .stall          (stall_pc),
             .clk            (clk),
             .rst            (rst),
             .d              (pc_next),
@@ -205,21 +214,39 @@ module datapath_pipelined (
         );
 
     // --- ALU Logic --- //
+    mux4 #(.WIDTH(32)) alu_DF_rd2_mux (
+            .sel        (alu_DF_sel_rd2),
+            .in0        (wd_dm_E),
+            .in1        (alu_out_M),
+            .in2        (alu_out_WB),
+            .in3        (wd_dm_E),
+            .out        (alu_DF_rd2_out)
+        );
+
     mux2 #(32) alu_pb_mux (
             .sel            (alu_src_E),
-            .a              (wd_dm_E),
+            .a              (alu_DF_rd2_out),
             .b              (sext_imm_E),
             .y              (alu_pb)
         );
+
+    mux4 #(.WIDTH(32)) alu_DF_rd1_mux (
+            .sel        (alu_DF_sel_rd1),
+            .in0        (rd1out_E),
+            .in1        (alu_out_M),
+            .in2        (alu_out_WB),
+            .in3        (rd1out_E),
+            .out        (alu_DF_rd1_out)
+        );   
     
     mux2 #(5) shift_rd1_mux (
         .sel    (shift_mux_sel_E),
-        .a      (rd1out_E[4:0]),
+        .a      (alu_DF_rd1_out[4:0]),
         .b      (instr_D[10:6]),
         .y      (shift_rd1_out)
     );
 
-    assign rd1_shift_full_out = {rd1out_E[31:5], shift_rd1_out};
+    assign rd1_shift_full_out = {alu_DF_rd1_out[31:5], shift_rd1_out};
    
     assign lw_sw_zero_sel_E = we_dm_E | dm2reg_E;
     mux2 #(32) lw_sw_zero_mux (
@@ -228,13 +255,6 @@ module datapath_pipelined (
         .b      (32'b0),
         .y      (alu_pa)
     );
-
-    // mux2 #(32) shift_rd1_mux (
-    //         .sel            (shift_mux_sel),
-    //         .a              (rd1_out),
-    //         .b              (instr),
-    //         .y              (alu_pa)
-    // );
 
     alu alu (
             .op             (alu_ctrl_E),
@@ -285,7 +305,34 @@ module datapath_pipelined (
         .y    (alu_mux_out)
     );
 
+
+wire test;
+assign test = 0;
+
+hazard_unit hazard_unit(
+    .test               (test),
+
+    // DF
+    .rs1E                (rs1E),
+    .rs2E                (rs2E),
+    .waM                 (rf_wa_M),
+    .we_reg_M            (we_reg_M),
+    .waWB                 (rf_wa_WB),
+    .we_reg_WB            (we_reg_WB),
+    .alu_data_forward_rd1   (alu_DF_sel_rd1),
+    .alu_data_forward_rd2   (alu_DF_sel_rd2),
+
+    // stall
+    .stall_pc           (stall_pc),
+    .stall_f2d          (stall_f2d),
+    .stall_d2e          (stall_d2e),
+    .stall_e2m          (stall_e2m),
+    .stall_m2wb         (stall_m2wb)
+);
+
 fetch2decode fetch2decode(
+    .stall_f2d          (stall_f2d),
+
     .clk(clk),
     .rst(rst),
     .instr(instr),
@@ -294,8 +341,13 @@ fetch2decode fetch2decode(
     .pc_plus4_D(pc_plus4_D)
 );
 
- 
 decode2execute decode2execute(
+    .stall_d2e          (stall_d2e),
+    // ALU DF
+    .instr_D            (instr_D),
+    .rs1E               (rs1E),
+    .rs2E               (rs2E),
+    
     .clk            (clk),
     .rst            (rst),
     .rd1out_D       (rd1_out),
@@ -343,6 +395,8 @@ decode2execute decode2execute(
 );
  
 execute2memory execute2memory(
+    .stall_e2m          (stall_e2m),
+    
     .clk            (clk),
     .rst            (rst),
     .zero_E         (zero_E),
@@ -384,6 +438,8 @@ execute2memory execute2memory(
 );
  
 memory2writeback memory2writeback(
+    .stall_m2wb         (stall_m2wb),
+    
     .rst            (rst),
     .clk            (clk),
     

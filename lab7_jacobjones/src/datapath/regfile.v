@@ -20,7 +20,7 @@ module regfile (
         rf[29] = 32'h100; // Initialze $sp
     end
     
-    always @ (posedge clk) begin
+    always @ (negedge clk) begin
         if (we) rf[wa] <= wd;
     end
 

@@ -20,6 +20,22 @@ module tb_mips_top_pipelined;
     wire [31:0]  pc_next = DUT.mips.dp.pc_next;
 
     // Debug
+    // --- Hazard --- //
+    wire [4:0] rs1E = DUT.mips.dp.hazard_unit.rs1E;
+    wire [4:0] rs2E = DUT.mips.dp.hazard_unit.rs2E;
+    wire [4:0] waM = DUT.mips.dp.hazard_unit.waM;
+    wire haz_we_reg_M = DUT.mips.dp.hazard_unit.we_reg_M;
+    wire [4:0] waWB = DUT.mips.dp.hazard_unit.waWB;
+    wire haz_we_reg_WB = DUT.mips.dp.hazard_unit.we_reg_WB;
+    wire [1:0] alu_data_forward_rd1 = DUT.mips.dp.hazard_unit.alu_data_forward_rd1;
+    wire [1:0] alu_data_forward_rd2 = DUT.mips.dp.hazard_unit.alu_data_forward_rd2;
+    wire stall_pc = DUT.mips.dp.hazard_unit.stall_pc;
+    wire stall_f2d = DUT.mips.dp.hazard_unit.stall_f2d;
+    wire stall_d2e = DUT.mips.dp.hazard_unit.stall_d2e;
+    wire stall_e2m = DUT.mips.dp.hazard_unit.stall_e2m;
+    wire stall_m2wb = DUT.mips.dp.hazard_unit.stall_m2wb;
+    wire [31:0]  alu_DF_rd1_out = DUT.mips.dp.alu_DF_rd1_out;
+    wire [31:0]  alu_DF_rd2_out = DUT.mips.dp.alu_DF_rd2_out;
     // --- F2D --- //
     wire [31:0]  instr_D = DUT.mips.dp.instr_D;
     wire [31:0]  pc_plus4_D = DUT.mips.dp.pc_plus4_D;

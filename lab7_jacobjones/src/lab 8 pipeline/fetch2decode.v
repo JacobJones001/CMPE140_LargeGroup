@@ -1,6 +1,8 @@
 // `timescale 1ns / 1ps
 
 module fetch2decode(
+	input wire stall_f2d,
+
     input wire clk,
 	input wire rst,
 	input wire [31:0] instr,
@@ -14,6 +16,11 @@ if (rst)
 begin
     instr_D 	<= 0;
 	pc_plus4_D 	<= 0;
+end
+else if (stall_f2d)
+begin
+	instr_D 	<= instr_D;
+	pc_plus4_D 	<= pc_plus4_D;
 end
 else
 begin

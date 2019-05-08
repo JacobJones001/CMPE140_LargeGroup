@@ -1,4 +1,6 @@
 module execute2memory(
+	input wire stall_e2m,
+
 	input wire clk, rst,
 	input wire zero_E,
 	input wire [31:0] pc_plus4_E,
@@ -64,7 +66,27 @@ module execute2memory(
 			branch_M 		<= 0;
 			we_reg_M		<= 0;
 		end 
+		else if(stall_e2m)
+		begin 
+			zero_M 		<= zero_M;
+			pc_plus4_M <= pc_plus4_M;
+			alu_out_M 	<= alu_out_M;
+			hilo_d_M 	<= hilo_d_M;
+			wd_dm_M 	<= wd_dm_M;
+			rf_wa_M		<= rf_wa_M;
 			
+			//CU
+			we_hilo_M 		<= we_hilo_M;
+			alu_out_sel_M 	<= alu_out_sel_M;
+			jal_M 			<= jal_M;
+			hilo_sel_M 		<= hilo_sel_M;
+			reg_jump_M 		<= reg_jump_M;
+			jump_M 			<= jump_M;
+			dm2reg_M 		<= dm2reg_M;
+			we_dm_M 		<= we_dm_M;
+			branch_M 		<= branch_M;
+			we_reg_M		<= we_reg_M;
+		end			
 		else
 		begin 
 			zero_M 		<= zero_E;

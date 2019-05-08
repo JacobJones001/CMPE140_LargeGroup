@@ -1,4 +1,6 @@
 module memory2writeback (
+    input wire stall_m2wb,
+
 	input wire alu_out_sel_M,
 	input wire jal_M,
 	input wire reg_jump_M,
@@ -43,6 +45,21 @@ always @(posedge clk, posedge rst)
                 alu_out_WB <= 0;
                 rf_wa_WB <=0;
                 pc_plus4_WB <=0;
+            end
+        else if(stall_m2wb)
+            begin
+                alu_out_sel_WB  <= 	alu_out_sel_WB; 
+                jal_WB          <=	jal_WB;
+                reg_jump_WB	  	<=	reg_jump_WB; 
+                jump_WB 	  	<=	jump_WB;
+                dm2reg_WB	  	<=	dm2reg_WB;
+                pc_src_WB       <=	pc_src_WB;
+                we_reg_WB       <=  we_reg_WB;
+                rd_dm_WB 		<= 	rd_dm_WB;
+                hilo_mux_out_WB  <= hilo_mux_out_WB;
+                alu_out_WB <= alu_out_WB;
+                rf_wa_WB <= rf_wa_WB;
+                pc_plus4_WB <= pc_plus4_WB;
             end
         else
             begin
