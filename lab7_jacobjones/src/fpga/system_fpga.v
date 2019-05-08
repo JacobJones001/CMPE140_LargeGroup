@@ -40,7 +40,7 @@ module system_fpga (
 
     assign gpi0_in = {28'b0, switches[3:0]};
 
-    system system(
+    system_pipelined system(
         .clk(clk_pb),
         .rst(rst),
         .gpi0(gpi0_in),

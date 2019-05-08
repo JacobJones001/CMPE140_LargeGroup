@@ -6,7 +6,7 @@ module imem_pipelined (
     reg [31:0] rom [0:63];
 
     initial begin
-        $readmemh ("lab8_pipeline_memfile.dat", rom);
+        $readmemh ("lab8_pipeline_factorial_memfile.dat", rom);
     end
 
     assign y = rom[a];
