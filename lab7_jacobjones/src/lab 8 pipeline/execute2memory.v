@@ -40,7 +40,7 @@ module execute2memory(
 		we_reg_M
 		
 );
-	always @ (posedge clk, rst) 
+	always @ (posedge clk, posedge rst) 
 		begin 
 		if (rst)
 		begin 
