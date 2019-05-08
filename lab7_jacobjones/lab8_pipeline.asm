@@ -17,7 +17,7 @@
     addi $t7, $zero, $zero # nop
     addi	$t1, $zero, 2			# $t0 = $t1 + 0
     addi $t7, $zero, $zero # nop
-    addi	$t0, $zero, 0x1			# $t0 = $t1 + 0
+    addi	$t0, $zero, 0x2			# $t0 = $t1 + 0
     addi	$t1, $zero, 0x4			# $t0 = $t1 + 0
     addi $t7, $zero, $zero # nop
     addi $t7, $zero, $zero # nop
@@ -46,8 +46,13 @@ branch_eq:
     multu $t0, $t1
     mflo $t2
     mfhi $t2
-    sll $t2, $t1, 0x1
-    srl $t2, $t2, 0x2
+    sll $t2, $t0, 0x1
+    srl $t2, $t1, 0x2
+    addi $t7, $zero, $zero # nop
+    addi $t7, $zero, $zero # nop
+    addi $t7, $zero, $zero # nop
+    addi $t7, $zero, $zero # nop
+    addi $t7, $zero, $zero # nop
 end:
 
 
