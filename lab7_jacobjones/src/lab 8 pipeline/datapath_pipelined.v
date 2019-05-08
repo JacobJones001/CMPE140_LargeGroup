@@ -26,8 +26,15 @@ module datapath_pipelined (
         output wire [31:0] instr_D,
 
         input wire we_dm_D,
-        output wire we_dm_M
+        output wire we_dm_M,
+
+        output wire [31:0] alu_out_M,
+        output wire [31:0] wd_dm_M       
     );
+
+        // lw and sw fix
+        wire [31:0] rd1_shift_full_out;
+        wire lw_sw_zero_sel_E;
 
         // F2D edit
         wire [31:0] pc_plus4_D;
@@ -47,9 +54,9 @@ module datapath_pipelined (
     
        wire zero_M;        
         wire [31:0] pc_plus4_M;     
-        wire [31:0] alu_out_M;      
+        // wire [31:0] alu_out_M;      
         wire [31:0] alu_out_WB;      
-        wire [31:0] wd_dm_M;       
+        // wire [31:0] wd_dm_M;       
         wire [63:0] hilo_d_M;       
         wire hilo_sel_out;
         //
@@ -205,15 +212,21 @@ module datapath_pipelined (
             .y              (alu_pb)
         );
     
-    assign alu_pa = {rd1_out[31:5], shift_rd1_out};
-    // assign alu_pa = {rd1_out[31:5], rd1_out[4:0]};
-    // assign alu_pa = (shift_mux_sel) ? instr : rd1_out;
-    
     mux2 #(5) shift_rd1_mux (
         .sel    (shift_mux_sel_E),
         .a      (rd1_out[4:0]),
         .b      (instr_D[10:6]),
         .y      (shift_rd1_out)
+    );
+
+    assign rd1_shift_full_out = {rd1_out[31:5], shift_rd1_out};
+   
+    assign lw_sw_zero_sel_E = we_dm_E | dm2reg_E;
+    mux2 #(32) lw_sw_zero_mux (
+        .sel    (lw_sw_zero_sel_E),
+        .a      (rd1_shift_full_out),
+        .b      (32'b0),
+        .y      (alu_pa)
     );
 
     // mux2 #(32) shift_rd1_mux (

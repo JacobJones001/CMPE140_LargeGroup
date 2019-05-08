@@ -17,6 +17,10 @@ module mips_top_pipelined (
         output wire [4:0] rf_wa
     );
 
+    // Data Memory Edit
+    wire [31:0] alu_out_M;
+    wire [31:0] wd_dm_M;      
+
     // wire [31:0] gpi0;
     // wire [31:0] gpi1;
     // assign gpi0 = {28'b0, gpi0_in};
@@ -45,7 +49,9 @@ module mips_top_pipelined (
             .wd_dm          (wd_dm),
             .rd3            (rd3),
             .wd_rf          (wd_rf),
-            .rf_wa          (rf_wa)
+            .rf_wa          (rf_wa),
+            .alu_out_M      (alu_out_M),
+            .wd_dm_M        (wd_dm_M)
         );
 
     imem_pipelined imem (
@@ -56,17 +62,17 @@ module mips_top_pipelined (
     dmem dmem (
             .clk            (clk),
             .we             (WEM),
-            .a              (alu_out[7:2]),
-            .d              (wd_dm),
+            .a              (alu_out_M[7:2]),
+            .d              (wd_dm_M),
             .q              (RdDM)
         );
 
     gpio gpio (
         .clk(clk),
         .reset(rst),
-        .A(alu_out[3:2]),
+        .A(alu_out_M[3:2]),
         .WE(WE2),
-        .WD(wd_dm),
+        .WD(wd_dm_M),
         .gpi0(gpi0),
         .gpi1(gpi1),
         .gpo0(gpo0),
@@ -77,15 +83,15 @@ module mips_top_pipelined (
     factorial_accelerator factorial_accelerator (
         .clk(clk),
         .reset(rst),
-        .A(alu_out[3:2]),
+        .A(alu_out_M[3:2]),
         .WE(WE1),
-        .WD(wd_dm[3:0]),
+        .WD(wd_dm_M[3:0]),
         .RD(RdFA)
     );
 
     soc_addr_dec soc_addr_dec (
         .WE(we_dm),
-        .A(alu_out),
+        .A(alu_out_M),
         .WE1(WE1),
         .WE2(WE2),
         .WEM(WEM),

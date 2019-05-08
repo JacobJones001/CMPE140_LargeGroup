@@ -26,7 +26,7 @@ module tb_mips_top_pipelined;
     // --- D2E --- //
         // -- data -- //
     wire [31:0]  rd1_out = DUT.mips.dp.rd1_out;
-    wire [31:0]  wd_dm2 = DUT.mips.dp.wd_dm;
+    wire [31:0]  wd_dm_D = DUT.mips.dp.wd_dm;
     wire [31:0]  sext_imm_D = DUT.mips.dp.sext_imm_D;
     wire [31:0]  pc_plus4 = DUT.mips.dp.pc_plus4;
     wire [31:0]  rd1out_E = DUT.mips.dp.rd1out_E;
@@ -72,6 +72,7 @@ module tb_mips_top_pipelined;
     wire [63:0]  hilo_d_M = DUT.mips.dp.hilo_d_M;
     wire [4:0]   rf_wa_M = DUT.mips.dp.rf_wa_M;
     wire [31:0]  pc_plus4_M = DUT.mips.dp.pc_plus4_M;
+    wire [31:0]  wd_dm_M = DUT.mips.dp.wd_dm_M;
         // -- cu -- //
     wire zero_E = DUT.mips.dp.zero_E;
     wire zero_M = DUT.mips.dp.zero_M;
@@ -295,7 +296,7 @@ module tb_mips_top_pipelined;
         gpi0 = 32'b1010;
         gpi1 = 32'b0110;
         // run_test;
-        while(pc_current != 32'h90) 
+        while(pc_current != 32'h140) 
         begin
             tick;
         end

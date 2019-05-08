@@ -18,7 +18,13 @@
     addi	$t1, $zero, 2			# $t0 = $t1 + 0
     addi $t7, $zero, $zero # nop
     addi	$t0, $zero, 0x1			# $t0 = $t1 + 0
-    addi	$t1, $zero, 0x2			# $t0 = $t1 + 0
+    addi	$t1, $zero, 0x4			# $t0 = $t1 + 0
+    addi $t7, $zero, $zero # nop
+    addi $t7, $zero, $zero # nop
+    addi $t7, $zero, $zero # nop
+    addi $t7, $zero, $zero # nop
+    addi $t7, $zero, $zero # nop
+    addi $t7, $zero, $zero # nop
     add  $t2, $t1, $t0
     sub  $t2, $t1, $t0
     and  $t2, $t1, $t0

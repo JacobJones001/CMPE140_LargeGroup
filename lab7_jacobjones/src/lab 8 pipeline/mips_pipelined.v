@@ -10,7 +10,9 @@ module mips_pipelined (
         output wire [31:0] wd_dm,
         output wire [31:0] rd3,
         output wire [31:0] wd_rf,
-        output wire [4:0] rf_wa
+        output wire [4:0] rf_wa,
+        output wire [31:0] alu_out_M,
+        output wire [31:0] wd_dm_M       
     );
 
     // F2D edit
@@ -59,7 +61,10 @@ module mips_pipelined (
             .instr_D        (instr_D),
 
             .we_dm_D(we_dm_D),
-            .we_dm_M(we_dm)
+            .we_dm_M(we_dm),
+
+            .alu_out_M(alu_out_M),
+            .wd_dm_M(wd_dm_M)
         );
 
     controlunit cu (
