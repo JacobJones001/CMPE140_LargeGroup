@@ -100,7 +100,7 @@ module datapath_pipelined (
     wire [31:0] pc_pre_WB;
     wire [31:0] pc_next;
     wire [31:0] pc_rj_plus4;
-    wire [31:0] sext_imm;
+    // wire [31:0] sext_imm;
     wire [31:0] ba;
     wire [31:0] bta;
     wire [31:0] jta;
@@ -127,7 +127,7 @@ module datapath_pipelined (
     wire [4:0] shift_rd1_out;
     
     assign pc_src = branch_E & zero_E;
-    assign ba = {sext_imm[29:0], 2'b00};
+    assign ba = {sext_imm_E[29:0], 2'b00};
     assign jta = {pc_plus4_D[31:28], instr_D[25:0], 2'b00};
     
     // --- PC Logic --- //
@@ -214,12 +214,12 @@ module datapath_pipelined (
     
     mux2 #(5) shift_rd1_mux (
         .sel    (shift_mux_sel_E),
-        .a      (rd1_out[4:0]),
+        .a      (rd1out_E[4:0]),
         .b      (instr_D[10:6]),
         .y      (shift_rd1_out)
     );
 
-    assign rd1_shift_full_out = {rd1_out[31:5], shift_rd1_out};
+    assign rd1_shift_full_out = {rd1out_E[31:5], shift_rd1_out};
    
     assign lw_sw_zero_sel_E = we_dm_E | dm2reg_E;
     mux2 #(32) lw_sw_zero_mux (
