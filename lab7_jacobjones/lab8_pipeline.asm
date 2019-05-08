@@ -33,8 +33,14 @@
     slt  $t2, $t0, $t1
     sw $t1, 0x20($zero)
     lw $t2, 0x20($zero)
+    addi $t7, $zero, $zero # nop
+    addi $t7, $zero, $zero # nop
+    addi $t7, $zero, $zero # nop
     beq $t0, $t1, branch_eq
     beq $t0, $t0, branch_eq
+    addi $t7, $zero, $zero # nop
+    addi $t7, $zero, $zero # nop
+    addi $t7, $zero, $zero # nop
     addi $t7, $zero, $zero # nop
 branch_eq:
     multu $t0, $t1
