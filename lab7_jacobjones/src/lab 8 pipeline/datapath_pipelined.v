@@ -134,9 +134,30 @@ module datapath_pipelined (
     wire [32-1:0] alu_out;
     // wire [31:0] shift_mul_mux_out;
     wire [4:0] shift_rd1_out;
-
     wire pc_src_zero;
-    assign pc_src_zero = (rd1_out == wd_dm);
+
+    wire [1:0] beq_rd1_sel, beq_rd2_sel;
+    wire [31:0] beq_rd1_out, beq_rd2_out;
+    // -- BEQ HAZARD --- //
+    mux4 #(.WIDTH(32)) beq_rd1_mux (
+            .sel        (beq_rd1_sel),
+            .in0        (rd1_out),
+            .in1        (wd_dm_E),
+            .in2        (alu_out_M),
+            .in3        (wd_rf),
+            .out        (beq_rd1_out)
+        );
+    
+    mux4 #(.WIDTH(32)) beq_rd2_mux (
+            .sel        (beq_rd2_sel),
+            .in0        (wd_dm),
+            .in1        (wd_dm_E),
+            .in2        (alu_out_M),
+            .in3        (wd_rf),
+            .out        (beq_rd2_out)
+        );
+
+    assign pc_src_zero = (beq_rd1_out == beq_rd2_out);
     assign pc_src = branch & pc_src_zero;
     assign ba = {sext_imm_D[29:0], 2'b00};
     assign jta = {pc_plus4_D[31:28], instr_D[25:0], 2'b00};
@@ -330,6 +351,12 @@ hazard_unit hazard_unit(
     .rs2D                   (instr_D[20:16]),
     .dm2reg_E               (dm2reg_E),
 
+    // beq DF
+    .waE                    (rf_wa_E),
+    .we_reg_E               (we_reg_E),
+    .beq_rd1_sel            (beq_rd1_sel), 
+    .beq_rd2_sel            (beq_rd2_sel), 
+    
     // stall/flush
     .stall_pc           (stall_pc),
     .stall_f2d          (stall_f2d),

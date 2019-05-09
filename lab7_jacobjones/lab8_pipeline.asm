@@ -22,7 +22,7 @@
     sw $t1, 0x20($zero)
     addi $t7, $zero, $zero # nop
     lw $t2, 0x20($zero)
-    add  $t2, $t2, $t0
+    add  $t0, $t2, $t0
     beq $t0, $t1, branch_eq
     beq $t0, $t0, branch_eq
     addi $t7, $zero, $zero # nop

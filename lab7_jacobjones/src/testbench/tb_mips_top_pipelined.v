@@ -36,6 +36,10 @@ module tb_mips_top_pipelined;
     wire stall_m2wb = DUT.mips.dp.hazard_unit.stall_m2wb;
     wire [31:0]  alu_DF_rd1_out = DUT.mips.dp.alu_DF_rd1_out;
     wire [31:0]  alu_DF_rd2_out = DUT.mips.dp.alu_DF_rd2_out;
+    wire [1:0]  beq_rd1_sel = DUT.mips.dp.beq_rd1_sel;
+    wire [1:0]  beq_rd2_sel = DUT.mips.dp.beq_rd2_sel;
+    wire [31:0]  beq_rd1_out = DUT.mips.dp.beq_rd1_out;
+    wire [31:0]  beq_rd2_out = DUT.mips.dp.beq_rd2_out;
     // --- F2D --- //
     wire [31:0]  instr_D = DUT.mips.dp.instr_D;
     wire [31:0]  pc_plus4_D = DUT.mips.dp.pc_plus4_D;

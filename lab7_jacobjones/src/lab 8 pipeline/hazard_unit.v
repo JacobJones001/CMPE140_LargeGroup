@@ -16,6 +16,12 @@ module hazard_unit(
     input wire [4:0] rs2D,
     input wire [1:0] dm2reg_E,
 
+    // beq data forwarding
+    input wire [4:0] waE,
+    input wire we_reg_E,
+    output wire [1:0] beq_rd1_sel,
+    output wire [1:0] beq_rd2_sel,
+
     output wire stall_pc,
     output wire stall_f2d,
     output wire stall_d2e,
@@ -38,6 +44,17 @@ module hazard_unit(
 
     assign alu_data_forward_rd1 = {alu_data_forward_rd1_WB, alu_data_forward_rd1_M};
     assign alu_data_forward_rd2 = {alu_data_forward_rd2_WB, alu_data_forward_rd2_M};
+
+    wire beq_rd1_sel_E, beq_rd1_sel_M, beq_rd1_sel_WB;
+    wire beq_rd2_sel_E, beq_rd2_sel_M, beq_rd2_sel_WB;
+    assign beq_rd1_sel_E = (rs1D != 0) & (rs1D == waE) & we_reg_E;
+    assign beq_rd2_sel_E = (rs2D != 0) & (rs2D == waE) & we_reg_E;
+    assign beq_rd1_sel_M = (rs1D != 0) & (rs1D == waM) & we_reg_M;
+    assign beq_rd2_sel_M = (rs2D != 0) & (rs2D == waM) & we_reg_M;
+    assign beq_rd1_sel_WB = (rs1D != 0) & (rs1D == waWB) & we_reg_WB;
+    assign beq_rd2_sel_WB = (rs2D != 0) & (rs2D == waWB) & we_reg_WB;
+    assign beq_rd1_sel = beq_rd1_sel_WB ? 2'b11 : {beq_rd1_sel_M, beq_rd1_sel_E};
+    assign beq_rd2_sel = beq_rd2_sel_WB ? 2'b11 : {beq_rd2_sel_M, beq_rd2_sel_E};
 
     wire lw_stall;
     assign lw_stall = ((rs1D == rs2E) | (rs2D == rs2E)) & dm2reg_E;
