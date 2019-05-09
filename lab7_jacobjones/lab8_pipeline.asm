@@ -27,8 +27,6 @@
     beq $t0, $t0, branch_eq
     addi $t7, $zero, $zero # nop
     addi $t7, $zero, $zero # nop
-    addi $t7, $zero, $zero # nop
-    addi $t7, $zero, $zero # nop
 branch_eq:
     multu $t0, $t1
     mflo $t2
