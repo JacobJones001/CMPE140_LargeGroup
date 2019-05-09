@@ -1,5 +1,6 @@
 module decode2execute(
 	input wire stall_d2e,
+	input wire flush_d2e,
 	input wire [31:0] instr_D,
 	output reg [4:0] rs1E,
 	output reg [4:0] rs2E,
@@ -31,7 +32,7 @@ module decode2execute(
 );
 
 always @ (posedge clk, posedge rst) begin
-if (rst)
+if (rst | flush_d2e)
 begin
 	// Hazard
 	rs1E <= 0;

@@ -38,7 +38,8 @@ module datapath_pipelined (
         wire [1:0] alu_DF_sel_rd1, alu_DF_sel_rd2;
         wire [4:0] rs1E, rs2E; 
         wire [31:0] alu_DF_rd1_out;    
-        wire [31:0] alu_DF_rd2_out;    
+        wire [31:0] alu_DF_rd2_out;
+        wire flush_d2e;
 
         // lw and sw fix
         wire [31:0] rd1_shift_full_out;
@@ -218,7 +219,7 @@ module datapath_pipelined (
             .sel        (alu_DF_sel_rd2),
             .in0        (wd_dm_E),
             .in1        (alu_out_M),
-            .in2        (alu_out_WB),
+            .in2        (wd_rf),
             .in3        (wd_dm_E),
             .out        (alu_DF_rd2_out)
         );
@@ -234,7 +235,7 @@ module datapath_pipelined (
             .sel        (alu_DF_sel_rd1),
             .in0        (rd1out_E),
             .in1        (alu_out_M),
-            .in2        (alu_out_WB),
+            .in2        (wd_rf),
             .in3        (rd1out_E),
             .out        (alu_DF_rd1_out)
         );   
@@ -321,11 +322,17 @@ hazard_unit hazard_unit(
     .we_reg_WB            (we_reg_WB),
     .alu_data_forward_rd1   (alu_DF_sel_rd1),
     .alu_data_forward_rd2   (alu_DF_sel_rd2),
+    
+    // lw DF
+    .rs1D                   (instr_D[25:21]),
+    .rs2D                   (instr_D[20:16]),
+    .dm2reg_E               (dm2reg_E),
 
-    // stall
+    // stall/flush
     .stall_pc           (stall_pc),
     .stall_f2d          (stall_f2d),
     .stall_d2e          (stall_d2e),
+    .flush_d2e          (flush_d2e),
     .stall_e2m          (stall_e2m),
     .stall_m2wb         (stall_m2wb)
 );
@@ -343,6 +350,7 @@ fetch2decode fetch2decode(
 
 decode2execute decode2execute(
     .stall_d2e          (stall_d2e),
+    .flush_d2e          (flush_d2e),
     // ALU DF
     .instr_D            (instr_D),
     .rs1E               (rs1E),

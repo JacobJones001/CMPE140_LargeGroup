@@ -20,10 +20,9 @@
     slt  $t2, $t1, $t0
     slt  $t2, $t0, $t1
     sw $t1, 0x20($zero)
+    addi $t7, $zero, $zero # nop
     lw $t2, 0x20($zero)
-    addi $t7, $zero, $zero # nop
-    addi $t7, $zero, $zero # nop
-    addi $t7, $zero, $zero # nop
+    add  $t2, $t2, $t0
     beq $t0, $t1, branch_eq
     beq $t0, $t0, branch_eq
     addi $t7, $zero, $zero # nop
@@ -36,9 +35,6 @@ branch_eq:
     mfhi $t2
     sll $t2, $t0, 0x1
     srl $t2, $t1, 0x2
-    addi $t7, $zero, $zero # nop
-    addi $t7, $zero, $zero # nop
-    addi $t7, $zero, $zero # nop
     addi $t7, $zero, $zero # nop
     addi $t7, $zero, $zero # nop
 end:
