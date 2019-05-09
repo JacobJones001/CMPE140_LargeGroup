@@ -21,6 +21,7 @@ module tb_mips_top_pipelined;
 
     // Debug
     // --- Hazard --- //
+    wire jump_branch_stall = DUT.mips.dp.hazard_unit.jump_branch_stall;
     wire [4:0] rs1E = DUT.mips.dp.hazard_unit.rs1E;
     wire [4:0] rs2E = DUT.mips.dp.hazard_unit.rs2E;
     wire [4:0] waM = DUT.mips.dp.hazard_unit.waM;

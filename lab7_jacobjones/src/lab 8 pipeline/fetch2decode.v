@@ -2,6 +2,7 @@
 
 module fetch2decode(
 	input wire stall_f2d,
+	input wire flush_f2d,
 
     input wire clk,
 	input wire rst,
@@ -12,7 +13,7 @@ module fetch2decode(
     output reg [31:0] pc_plus4_D
 );
 always @ (posedge clk, posedge rst) begin
-if (rst)
+if (rst | flush_f2d)
 begin
     instr_D 	<= 0;
 	pc_plus4_D 	<= 0;

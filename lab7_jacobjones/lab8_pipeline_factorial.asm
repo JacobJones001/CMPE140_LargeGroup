@@ -19,10 +19,7 @@ main:
     # addi $t0, $zero, 0x2
 fact_loop:
     lw $v1, 0x8($zero)
-    addi $t7, $zero, $zero # nop
-    addi $t7, $zero, $zero # nop
-    addi $t7, $zero, $zero # nop
-    addi $t7, $zero, $zero # nop
+    addi $v1, $v1, $zero
     beq $v1, $zero, fact_loop
 fact_end:
     lw $a1, 0xc($zero)

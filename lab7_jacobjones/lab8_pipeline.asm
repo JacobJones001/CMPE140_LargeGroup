@@ -23,6 +23,7 @@
     addi $t7, $zero, $zero # nop
     lw $t2, 0x20($zero)
     add  $t0, $t2, $t0
+    addi $t7, $zero, $zero # nop
     beq $t0, $t1, branch_eq
     beq $t0, $t0, branch_eq
     addi $t7, $zero, $zero # nop

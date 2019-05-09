@@ -1,5 +1,6 @@
 module hazard_unit(
     input wire test,
+    input wire clk,
 
     // alu data forwarding
     input wire [4:0] rs1E,
@@ -22,11 +23,16 @@ module hazard_unit(
     output wire [1:0] beq_rd1_sel,
     output wire [1:0] beq_rd2_sel,
 
+    // branch/jump stall
+    input wire [31:0] instr_F,
+    input wire [31:0] instr_D,
+
     output wire stall_pc,
     output wire stall_f2d,
     output wire stall_d2e,
     output wire stall_e2m,
     output wire stall_m2wb,
+    output wire flush_f2d,
     output wire flush_d2e
 );
     // reg [4:0] ctrl;    
@@ -56,11 +62,28 @@ module hazard_unit(
     assign beq_rd1_sel = beq_rd1_sel_WB ? 2'b11 : {beq_rd1_sel_M, beq_rd1_sel_E};
     assign beq_rd2_sel = beq_rd2_sel_WB ? 2'b11 : {beq_rd2_sel_M, beq_rd2_sel_E};
 
+    wire jump_branch_stall;
+    reg jump_branch_stall_reg;
+    assign jump_branch_stall = //(instr_D == 32'b0) ? 1'b0 :
+                (jump_branch_stall_reg) ? 0'b0 :
+                (instr_F[31:26] == 6'h4) | // beq
+                (instr_F[31:26] == 6'h2) | // j
+                (instr_F[31:26] == 6'h3) | // jal
+                ((instr_F[31:26] == 6'h0) & (instr_F[5:0] == 6'h8)) ; // jr
+                
+
+    always @ (posedge clk) begin
+        jump_branch_stall_reg <= jump_branch_stall;
+    end
+    // assign flush_f2d = jump_branch_stall;
+    assign flush_f2d = 0'b0;
+
     wire lw_stall;
     assign lw_stall = ((rs1D == rs2E) | (rs2D == rs2E)) & dm2reg_E;
-    assign stall_pc = lw_stall;
+    assign stall_pc = lw_stall | jump_branch_stall;
+    // assign stall_pc = lw_stall | 0'b0;
     assign stall_f2d = lw_stall;
-    assign flush_d2e = lw_stall;
+    assign flush_d2e = lw_stall | jump_branch_stall;
     assign stall_d2e = 1'b0;
     assign stall_e2m = 1'b0;
     assign stall_m2wb = 1'b0;

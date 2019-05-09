@@ -39,6 +39,7 @@ module datapath_pipelined (
         wire [4:0] rs1E, rs2E; 
         wire [31:0] alu_DF_rd1_out;    
         wire [31:0] alu_DF_rd2_out;
+        wire flush_f2d;
         wire flush_d2e;
 
         // lw and sw fix
@@ -335,6 +336,7 @@ assign test = 0;
 
 hazard_unit hazard_unit(
     .test               (test),
+    .clk                (clk),
 
     // DF
     .rs1E                (rs1E),
@@ -356,10 +358,15 @@ hazard_unit hazard_unit(
     .we_reg_E               (we_reg_E),
     .beq_rd1_sel            (beq_rd1_sel), 
     .beq_rd2_sel            (beq_rd2_sel), 
+
+    // branch/jump stall
+    .instr_F                (instr),
+    .instr_D                (instr_D),
     
     // stall/flush
     .stall_pc           (stall_pc),
     .stall_f2d          (stall_f2d),
+    .flush_f2d          (flush_f2d),
     .stall_d2e          (stall_d2e),
     .flush_d2e          (flush_d2e),
     .stall_e2m          (stall_e2m),
@@ -368,6 +375,7 @@ hazard_unit hazard_unit(
 
 fetch2decode fetch2decode(
     .stall_f2d          (stall_f2d),
+    .flush_f2d          (flush_f2d),
 
     .clk(clk),
     .rst(rst),
